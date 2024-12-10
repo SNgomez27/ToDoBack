@@ -4,17 +4,20 @@ package org.proyecto.primerproyecto.controllers;
 import org.proyecto.primerproyecto.models.Usuario;
 import org.proyecto.primerproyecto.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin(origins = "*")
+
 public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
@@ -30,18 +33,8 @@ public class UsuarioController {
     }
 
 
-    @GetMapping("/create/{username}/{password}/{nombre}/{email}/{edad}")
-    public void createUser(@PathVariable String username,
-                            @PathVariable String password,
-                           @PathVariable String nombre,
-                           @PathVariable String email,
-                           @PathVariable int edad) {
-    Usuario usuario = new Usuario();
-    usuario.setUsername(username);
-    usuario.setPassword(password);
-    usuario.setNombre(nombre);
-    usuario.setEmail(email);
-    usuario.setEdad(edad);
+    @PostMapping("/create")
+    public void createUser(@RequestBody Usuario usuario) {
     this.usuarioService.createUser(usuario);
     }
 
@@ -50,6 +43,13 @@ public class UsuarioController {
     public  void deleteUser(@PathVariable Long id) {
     this.usuarioService.delete(id);
 
+    }
+
+    @GetMapping ("/status")
+    public Map<String, String> checkCtatus(){
+    Map<String, String> response = new HashMap<>();
+    response.put("message", "conexion establecida");
+        return response;
     }
 
 
