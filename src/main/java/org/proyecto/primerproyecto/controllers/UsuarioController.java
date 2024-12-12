@@ -9,10 +9,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -51,6 +48,48 @@ public class UsuarioController {
     response.put("message", "conexion establecida");
         return response;
     }
+    @PostMapping("/login")
+    public  ResponseEntity<Map<String, Object>> login(@RequestBody  Map <String, String> credenciales) {
+    
+    String username = credenciales.get("username");
+    String password = credenciales.get("password");
+    
+    boolean isAuth = this.usuarioService.authenticate(username, password);
+    Map<String, Object> respuesta = new HashMap<>();
+    
+    if (isAuth) {
+        respuesta.put("message", "Login exitoso");
+        respuesta.put("login", true);
+        return ResponseEntity.ok(respuesta);
+    } 
+    else {
+        respuesta.put("message", "Datos incorrecto");
+        respuesta.put("login", false);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(respuesta);
+    }
+    }
 
+    @PostMapping("/login/v2")
+    public  ResponseEntity<Map<String, Object>> loginv2(@RequestBody  Map <String, String> credenciales) {
+        String username = credenciales.get("username");
+        String password = credenciales.get("password");
 
-}
+        String result = this.usuarioService.authWithPassword(username, password);
+        Map<String, Object> respuesta = new HashMap<>();
+        if (result.equals("Usuario existe")) {
+            respuesta.put("message", result);
+            respuesta.put("login", true);
+            return ResponseEntity.ok(respuesta);
+        } else if (result.equals(" Contraseña Incorrecta ")) {
+            respuesta.put("message", result);
+            respuesta.put("login", false);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(respuesta);
+        }else {
+            respuesta.put("message", result);
+            respuesta.put("login", false);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
+
+        }
+    }
+
+    }
